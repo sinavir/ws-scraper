@@ -7,6 +7,7 @@ import sys
 import websockets
 import aiosqlite
 import json
+from os.path import isfile as path_exists
 from time import time
 
 logging.basicConfig(level = logging.DEBUG)
@@ -21,38 +22,36 @@ async def init_db(db_path):
     if not path_exists(db_path):
         logging.info("Database not found at {db_path}, creating a new one")
     async with aiosqlite.connect(db_path) as db:
-        c = db.corsor()
-        c.execute('''
+        await db.execute('''
                   CREATE TABLE IF NOT EXISTS data (
                       id INTEGER PRIMARY KEY,
                       date INTEGER,
                       json_diff TEXT
                   )
         ''')
-        return db
     raise Exception("Failed to open db")
 
 
 
 async def listen(url, db_path):
-    db = await init_db(db_path)
-    currentState  = None
-    async for ws in websockets.connect(url):
-        try: 
-            async for msg in ws:
-                newState = json.encode(msg)
-                if currentState is None:
-                    diff = newState
-                else:
-                    diff = python_dict_diff(newState, currentState)
-                currentState = newState
-                if diff != {}:
-                    c = db.cursor()
-                    await c.execute('INSERT INTO data (date, json_diff) VALUES ( ? , ? )', (int(time()), json.dumps(diff)))
-                    logging.info(f"inserted data into db. diff={diff}")
-        except websockets.ConnectionClosed as e:
-            logging.info(f"Exception caught: {e}")
-        logging.info("Connection ended, retrying")
+    init_db(db_path)
+    async with aiosqlite.connect(db_path) as db:
+        currentState  = None
+        async for ws in websockets.connect(url):
+            try: 
+                async for msg in ws:
+                    newState = json.loads(msg)
+                    if currentState is None:
+                        diff = newState
+                    else:
+                        diff = python_dict_diff(newState, currentState)
+                    currentState = newState
+                    if diff != {}:
+                        await db.execute('INSERT INTO data (date, json_diff) VALUES ( ? , ? )', (int(time()), json.dumps(diff)))
+                        logging.info(f"inserted data into db. diff={diff}")
+            except websockets.ConnectionClosed as e:
+                logging.info(f"Exception caught: {e}")
+            logging.info("Connection ended, retrying")
     logging.info("End of script")
 
 def main():

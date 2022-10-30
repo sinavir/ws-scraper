@@ -4,5 +4,5 @@ buildPythonApplication rec {
   version = "0.1";
   doCheck = false;
   src = ./. ;
-  propagatedBuildInputs = [ aiosqlite websockets ];
+  propagatedBuildInputs = builtins.trace "${aiosqlite}" [ aiosqlite websockets ];
 }
