@@ -29,12 +29,11 @@ async def init_db(db_path):
                       json_diff TEXT
                   )
         ''')
-    raise Exception("Failed to open db")
 
 
 
 async def listen(url, db_path):
-    init_db(db_path)
+    await init_db(db_path)
     async with aiosqlite.connect(db_path) as db:
         currentState  = None
         async for ws in websockets.connect(url):
