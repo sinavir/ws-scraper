@@ -1,16 +1,16 @@
 from setuptools import setup
 
 setup(
-    name='ws_scrapper',
+    name='ws_scraper',
     version='0.1',
-    packages=['ws_scrapper'],
+    packages=['ws_scraper'],
     install_requires=[
         'websockets',
         'aiosqlite',
     ],
     entry_points={
         'console_scripts': [
-            'ws-scrapper = ws_scrapper:main',
+            'ws-scraper = ws_scraper:main',
         ],
     },
 )

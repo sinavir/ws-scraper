@@ -1,6 +1,6 @@
 { lib , pkgs, buildPythonApplication, aiosqlite, websockets, fetchFromGitHub }:
 buildPythonApplication rec {
-  pname = "ws-scrapper";
+  pname = "ws-scraper";
   version = "0.1";
   doCheck = false;
   src = ./. ;
