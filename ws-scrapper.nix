@@ -1,8 +1,8 @@
-{ lib , pkgs, buildPythonApplication, websockets, fetchFromGitHub }:
+{ lib , pkgs, buildPythonApplication, aiosqlite, websockets, fetchFromGitHub }:
 buildPythonApplication rec {
   pname = "ws-scrapper";
-  version = "1.0";
+  version = "0.1";
   doCheck = false;
   src = ./. ;
-  propagatedBuildInputs = [ websockets ];
+  propagatedBuildInputs = [ aiosqlite websockets ];
 }
