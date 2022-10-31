@@ -47,6 +47,7 @@ async def listen(url, db_path):
                 if diff != {}:
                     async with aiosqlite.connect(db_path) as db:
                         await db.execute('INSERT INTO data (date, json_diff) VALUES ( ? , ? )', (int(time()), json.dumps(diff)))
+                        await db.commit()
                         logging.info(f"Inserted data into db. diff={diff}")
         except websockets.ConnectionClosed as e:
             logging.info(f"Exception caught: {e}")
